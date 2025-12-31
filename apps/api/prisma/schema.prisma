@@ -1,0 +1,352 @@
+// Prisma Schema for Life Tracker
+// Documentation: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================================================
+// USER & PROFILE
+// ============================================================================
+
+model User {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  profile           PlayerProfile?
+  goals             Goal[]
+  bucketItems       BucketItem[]
+  habits            Habit[]
+  incomes           Income[]
+  expenses          Expense[]
+  expenseCategories ExpenseCategory[]
+  savingsGoals      SavingsGoal[]
+  budgets           Budget[]
+  achievements      UserAchievement[]
+
+  @@index([deletedAt])
+}
+
+model PlayerProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  totalXP         Int      @default(0)
+  currentLevel    Int      @default(1)
+  goalsCompleted  Int      @default(0)
+  bucketCompleted Int      @default(0)
+  habitsCompleted Int      @default(0)
+  totalSaved      Decimal  @default(0) @db.Decimal(12, 2)
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================================
+// GOALS
+// ============================================================================
+
+enum GoalCategory {
+  CAREER
+  HEALTH
+  LEARNING
+  RELATIONSHIPS
+  FINANCE
+  PERSONAL_GROWTH
+  OTHER
+}
+
+enum Timeline {
+  SHORT_TERM
+  MID_TERM
+  LONG_TERM
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum GoalStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+}
+
+model Goal {
+  id           String       @id @default(cuid())
+  userId       String
+  title        String
+  category     GoalCategory
+  timeline     Timeline
+  priority     Priority
+  startDate    DateTime     @db.Date
+  targetDate   DateTime     @db.Date
+  progress     Int          @default(0)
+  status       GoalStatus   @default(NOT_STARTED)
+  pointsEarned Int          @default(0)
+  notes        String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  deletedAt    DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([deletedAt])
+}
+
+// ============================================================================
+// BUCKET LIST
+// ============================================================================
+
+enum BucketCategory {
+  TRAVEL
+  SKILLS
+  EXPERIENCES
+  MILESTONES
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+  EPIC
+}
+
+model BucketItem {
+  id            String         @id @default(cuid())
+  userId        String
+  title         String
+  category      BucketCategory
+  difficulty    Difficulty
+  estimatedCost Decimal        @default(0) @db.Decimal(12, 2)
+  isCompleted   Boolean        @default(false)
+  completedAt   DateTime?
+  pointsEarned  Int            @default(0)
+  notes         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isCompleted])
+  @@index([deletedAt])
+}
+
+// ============================================================================
+// HABITS
+// ============================================================================
+
+enum HabitType {
+  BINARY
+  NUMERIC
+}
+
+model Habit {
+  id            String    @id @default(cuid())
+  userId        String
+  name          String
+  type          HabitType
+  unit          String?
+  dailyTarget   Int       @default(1)
+  pointsPerDay  Int       @default(5)
+  isActive      Boolean   @default(true)
+  currentStreak Int       @default(0)
+  bestStreak    Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs HabitLog[]
+
+  @@index([userId, isActive])
+  @@index([deletedAt])
+}
+
+model HabitLog {
+  id           String    @id @default(cuid())
+  habitId      String
+  date         DateTime  @db.Date
+  completed    Boolean   @default(false)
+  value        Int?
+  pointsEarned Int       @default(0)
+  createdAt    DateTime  @default(now())
+  deletedAt    DateTime?
+
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, date])
+  @@index([habitId, date])
+  @@index([deletedAt])
+}
+
+// ============================================================================
+// FINANCE
+// ============================================================================
+
+enum IncomeCategory {
+  SALARY
+  FREELANCE
+  INVESTMENTS
+  GIFTS
+  BONUS
+  OTHER
+}
+
+model Income {
+  id          String         @id @default(cuid())
+  userId      String
+  date        DateTime       @db.Date
+  description String
+  amount      Decimal        @db.Decimal(12, 2)
+  category    IncomeCategory
+  notes       String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  deletedAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@index([deletedAt])
+}
+
+enum PaymentMethod {
+  CASH
+  UPI
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_TRANSFER
+}
+
+model ExpenseCategory {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  icon        String    @default("📦")
+  budgetLimit Decimal?  @db.Decimal(12, 2)
+  isDefault   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expenses Expense[]
+  budgets  Budget[]
+
+  @@unique([userId, name])
+  @@index([deletedAt])
+}
+
+model Expense {
+  id            String        @id @default(cuid())
+  userId        String
+  date          DateTime      @db.Date
+  description   String
+  amount        Decimal       @db.Decimal(12, 2)
+  categoryId    String
+  paymentMethod PaymentMethod
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category ExpenseCategory @relation(fields: [categoryId], references: [id])
+
+  @@index([userId, date])
+  @@index([categoryId])
+  @@index([deletedAt])
+}
+
+model SavingsGoal {
+  id            String    @id @default(cuid())
+  userId        String
+  name          String
+  targetAmount  Decimal   @db.Decimal(12, 2)
+  currentAmount Decimal   @default(0) @db.Decimal(12, 2)
+  startDate     DateTime  @db.Date
+  targetDate    DateTime  @db.Date
+  priority      Priority
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([deletedAt])
+}
+
+model Budget {
+  id         String   @id @default(cuid())
+  userId     String
+  categoryId String
+  amount     Decimal  @db.Decimal(12, 2)
+  month      Int
+  year       Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category ExpenseCategory @relation(fields: [categoryId], references: [id])
+
+  @@unique([userId, categoryId, year, month])
+  @@index([userId, year, month])
+}
+
+// ============================================================================
+// ACHIEVEMENTS
+// ============================================================================
+
+enum AchievementCategory {
+  GOALS
+  HABITS
+  FINANCE
+  BUCKET_LIST
+  OVERALL
+}
+
+model Achievement {
+  id          String              @id @default(cuid())
+  code        String              @unique
+  name        String
+  description String
+  category    AchievementCategory
+  icon        String
+  requirement String
+  bonusPoints Int
+  isSecret    Boolean             @default(false)
+  createdAt   DateTime            @default(now())
+
+  unlockedBy UserAchievement[]
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+  pointsAwarded Int
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
