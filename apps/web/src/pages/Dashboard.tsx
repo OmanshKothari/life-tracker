@@ -148,6 +148,48 @@ export function Dashboard() {
         </CardContent>
       </Card>
 
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Sparkles className="w-5 h-5" />
+            Quick Actions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-3">
+            <Button onClick={() => setIsGoalFormOpen(true)}>
+              <Target className="w-4 h-4 mr-2" />
+              New Goal
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/habits">
+                <CheckCircle2 className="w-4 h-4 mr-2" />
+                Log Habits
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/finance">
+                <Wallet className="w-4 h-4 mr-2" />
+                Add Expense
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/savings">
+                <PiggyBank className="w-4 h-4 mr-2" />
+                Add Savings
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/bucket-list">
+                <ListChecks className="w-4 h-4 mr-2" />
+                Bucket List
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Quick Stats Grid */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         {/* Goals */}
@@ -489,48 +531,6 @@ export function Dashboard() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Sparkles className="w-5 h-5" />
-            Quick Actions
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-3">
-            <Button onClick={() => setIsGoalFormOpen(true)}>
-              <Target className="w-4 h-4 mr-2" />
-              New Goal
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/habits">
-                <CheckCircle2 className="w-4 h-4 mr-2" />
-                Log Habits
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/finance">
-                <Wallet className="w-4 h-4 mr-2" />
-                Add Expense
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/savings">
-                <PiggyBank className="w-4 h-4 mr-2" />
-                Add Savings
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/bucket-list">
-                <ListChecks className="w-4 h-4 mr-2" />
-                Bucket List
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Goal Form Modal */}
       <GoalForm

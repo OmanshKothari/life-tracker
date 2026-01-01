@@ -4,3 +4,4 @@ export { useHabitsStore } from './habits.store';
 export { useBucketListStore } from './bucketList.store';
 export { useFinanceStore } from './finance.store';
 export { useAchievementsStore } from './achievements.store';
+export { useAnalyticsStore } from './analytics.store';

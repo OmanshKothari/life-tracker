@@ -12,6 +12,7 @@ import {
   Trophy,
   Settings,
   X,
+  BarChart3,
 } from 'lucide-react';
 
 interface NavItem {
@@ -28,6 +29,7 @@ const navItems: NavItem[] = [
   { label: 'Finance', href: '/finance', icon: <Wallet size={20} /> },
   { label: 'Savings', href: '/savings', icon: <PiggyBank size={20} /> },
   { label: 'Achievements', href: '/achievements', icon: <Trophy size={20} /> },
+  { label: 'Analytics', href: '/analytics', icon: <BarChart3 size={20} /> },
   { label: 'Settings', href: '/settings', icon: <Settings size={20} /> },
 ];
 

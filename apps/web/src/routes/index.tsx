@@ -9,6 +9,7 @@ import {
   ComingSoon,
   Savings,
   Achievements,
+  Analytics,
 } from '@/pages';
 
 export default function AppRoutes() {
@@ -22,6 +23,7 @@ export default function AppRoutes() {
         <Route path="/finance" element={<Finance />} />
         <Route path="/savings" element={<Savings />} />
         <Route path="/achievements" element={<Achievements />} />
+        <Route path="/analytics" element={<Analytics />} />
         <Route path="/settings" element={<ComingSoon title="Settings" icon="⚙️" />} />
         <Route path="/more" element={<ComingSoon title="More Options" icon="📋" />} />
       </Route>

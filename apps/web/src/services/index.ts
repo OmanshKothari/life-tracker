@@ -6,3 +6,4 @@ export * from './habits.api';
 export * from './bucketList.api';
 export * from './finance.api';
 export * from './achievements.api';
+export * from './analytics.api';
