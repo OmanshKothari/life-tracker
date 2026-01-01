@@ -1,33 +1,20 @@
 import { Router } from 'express';
-import profileRouter from './profile.routes';
-import goalsRouter from './goals.routes';
-import bucketListRouter from './bucketList.routes';
-import habitsRouter from './habits.routes';
-import financeRouter from './finance.routes';
+import healthRoutes from './health.routes';
+import profileRoutes from './profile.routes';
+import goalsRoutes from './goals.routes';
+import habitsRoutes from './habits.routes';
+import bucketListRoutes from './bucketList.routes';
+import financeRoutes from './finance.routes';
+import achievementsRoutes from './achievements.routes';
 
 const router: Router = Router();
 
-router.get('/', (_req, res) => {
-  res.json({
-    success: true,
-    data: {
-      name: 'Life Tracker API',
-      version: '1.0.0',
-      endpoints: {
-        profile: '/api/v1/profile',
-        goals: '/api/v1/goals',
-        bucketList: '/api/v1/bucket-list',
-        habits: '/api/v1/habits',
-        finance: '/api/v1/finance',
-      },
-    },
-  });
-});
-
-router.use('/profile', profileRouter);
-router.use('/goals', goalsRouter);
-router.use('/bucket-list', bucketListRouter);
-router.use('/habits', habitsRouter);
-router.use('/finance', financeRouter);
+router.use('/health', healthRoutes);
+router.use('/profile', profileRoutes);
+router.use('/goals', goalsRoutes);
+router.use('/habits', habitsRoutes);
+router.use('/bucket-list', bucketListRoutes);
+router.use('/finance', financeRoutes);
+router.use('/achievements', achievementsRoutes);
 
 export default router;

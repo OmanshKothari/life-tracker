@@ -72,10 +72,20 @@ export const bucketListApi = {
   },
 
   async complete(id: string, notes?: string) {
-    const response = await api.patch<ApiResponse<BucketItem & { pointsAwarded: number }>>(
-      `/bucket-list/${id}/complete`,
-      { notes }
-    );
+    const response = await api.patch<
+      ApiResponse<
+        BucketItem & {
+          pointsAwarded: number;
+          achievements?: Array<{
+            code: string;
+            name: string;
+            description: string;
+            icon: string;
+            pointsAwarded: number;
+          }>;
+        }
+      >
+    >(`/bucket-list/${id}/complete`, { notes });
     return response.data.data;
   },
 

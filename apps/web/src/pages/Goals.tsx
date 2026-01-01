@@ -105,13 +105,25 @@ export function Goals() {
   // Handle complete
   const handleComplete = async (goal: Goal) => {
     try {
-      const { pointsAwarded } = await completeGoal(goal.id);
+      const { pointsAwarded, achievements } = await completeGoal(goal.id);
       await fetchProfile(); // Refresh XP in header
       toast({
         title: 'Goal completed! 🎉',
         description: `Congratulations! You earned ${pointsAwarded} XP!`,
         variant: 'success',
       });
+      // Show achievement notifications
+      if (achievements && achievements.length > 0) {
+        achievements.forEach((achievement) => {
+          setTimeout(() => {
+            toast({
+              title: `🏆 Achievement Unlocked!`,
+              description: `${achievement.icon} ${achievement.name} (+${achievement.pointsAwarded} XP)`,
+              variant: 'success',
+            });
+          }, 500);
+        });
+      }
     } catch (error) {
       toast({
         title: 'Error',

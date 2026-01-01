@@ -19,7 +19,19 @@ interface BucketListState {
   fetchStats: () => Promise<void>;
   createItem: (data: CreateBucketItemData) => Promise<BucketItem>;
   updateItem: (id: string, data: Partial<CreateBucketItemData>) => Promise<void>;
-  completeItem: (id: string, notes?: string) => Promise<{ pointsAwarded: number }>;
+  completeItem: (
+    id: string,
+    notes?: string
+  ) => Promise<{
+    pointsAwarded: number;
+    achievements: Array<{
+      code: string;
+      name: string;
+      description: string;
+      icon: string;
+      pointsAwarded: number;
+    }>;
+  }>;
   deleteItem: (id: string) => Promise<void>;
   setFilters: (filters: BucketListFilters) => void;
 }
@@ -95,7 +107,7 @@ export const useBucketListStore = create<BucketListState>((set, get) => ({
       const result = await bucketListApi.complete(id, notes);
       await Promise.all([get().fetchItems(), get().fetchStats()]);
       set({ isLoading: false });
-      return { pointsAwarded: result.pointsAwarded };
+      return { pointsAwarded: result.pointsAwarded, achievements: result.achievements || [] };
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to complete item',

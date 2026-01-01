@@ -143,7 +143,7 @@ export const useGoalsStore = create<GoalsState>((set, get) => ({
   completeGoal: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      const { pointsAwarded, ...completedGoal } = await goalsApi.complete(id);
+      const { pointsAwarded, achievements, ...completedGoal } = await goalsApi.complete(id);
       set((state) => ({
         goals: state.goals.map((g) =>
           g.id === id ? { ...g, ...completedGoal, status: 'COMPLETED', progress: 100 } : g
@@ -151,7 +151,7 @@ export const useGoalsStore = create<GoalsState>((set, get) => ({
         isLoading: false,
       }));
       await get().fetchStats();
-      return { pointsAwarded };
+      return { pointsAwarded, achievements: achievements || [] };
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to complete goal',

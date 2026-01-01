@@ -286,8 +286,8 @@ export async function createSavingsGoal(
 ): Promise<void> {
   try {
     const userId = await profileService.getCurrentUserId();
-    const goal = await financeService.createSavingsGoal(userId, req.body);
-    sendCreated(res, goal);
+    const { goal, achievements } = await financeService.createSavingsGoal(userId, req.body);
+    sendCreated(res, { ...goal, achievements });
   } catch (error) {
     next(error);
   }
@@ -311,8 +311,8 @@ export async function addToSavings(req: Request, res: Response, next: NextFuncti
   try {
     const userId = await profileService.getCurrentUserId();
     const { amount } = req.body as { amount: number };
-    const goal = await financeService.addToSavings(req.params.id, userId, amount);
-    sendSuccess(res, goal);
+    const { goal, achievements } = await financeService.addToSavings(req.params.id, userId, amount);
+    sendSuccess(res, { ...goal, achievements });
   } catch (error) {
     next(error);
   }

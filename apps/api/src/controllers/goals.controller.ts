@@ -111,11 +111,15 @@ export async function updateGoalProgress(
 export async function completeGoal(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const userId = await profileService.getCurrentUserId();
-    const { goal, pointsAwarded } = await goalsService.complete(req.params.id, userId);
+    const { goal, pointsAwarded, achievements } = await goalsService.complete(
+      req.params.id,
+      userId
+    );
 
     sendSuccess(res, {
       ...goal,
       pointsAwarded,
+      achievements,
       message: `Congratulations! You earned ${pointsAwarded} XP!`,
     });
   } catch (error) {

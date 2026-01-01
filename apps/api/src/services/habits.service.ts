@@ -1,5 +1,6 @@
 import { Habit, HabitLog } from '@prisma/client';
 import { profileService } from './profile.service';
+import { achievementsService, UnlockedAchievement } from './achievements.service';
 import { ApiError } from '../middlewares/errorHandler';
 import { habitsRepository } from '../repositories';
 import { PaginatedResult } from '../repositories/goals.repository';
@@ -82,7 +83,12 @@ class HabitsService {
     id: string,
     userId: string,
     data: LogHabitInput
-  ): Promise<{ log: HabitLog; pointsEarned: number; isNewCompletion: boolean }> {
+  ): Promise<{
+    log: HabitLog;
+    pointsEarned: number;
+    isNewCompletion: boolean;
+    achievements: UnlockedAchievement[];
+  }> {
     const habit = await habitsRepository.findById(id, userId);
     if (!habit) {
       throw ApiError.notFound('Habit');
@@ -125,10 +131,25 @@ class HabitsService {
       await profileService.addXP(pointsToAward);
     }
 
+    // Check for achievements if this was a new completion
+    let achievements: UnlockedAchievement[] = [];
+    if (isNewCompletion && meetsTarget) {
+      // Get updated habit with streak
+      const updatedHabit = await habitsRepository.findById(id, userId);
+      const totalCompletions = await habitsRepository.countCompleted(userId);
+
+      achievements = await achievementsService.checkHabitAchievements(
+        userId,
+        totalCompletions,
+        updatedHabit?.currentStreak || 0
+      );
+    }
+
     return {
       log,
       pointsEarned: pointsToAward,
       isNewCompletion: isNewCompletion && meetsTarget,
+      achievements,
     };
   }
 

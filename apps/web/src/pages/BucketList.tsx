@@ -91,13 +91,25 @@ export function BucketList() {
         finalNotes = `${notes}\n\nActual spent: ₹${actualCost.toLocaleString()}`;
       }
 
-      const { pointsAwarded } = await completeItem(itemToComplete.id, finalNotes);
+      const { pointsAwarded, achievements } = await completeItem(itemToComplete.id, finalNotes);
       await fetchProfile();
       toast({
         title: 'Dream achieved! 🎉',
         description: `You earned ${pointsAwarded} XP!`,
         variant: 'success',
       });
+      // Show achievement notifications
+      if (achievements && achievements.length > 0) {
+        achievements.forEach((achievement) => {
+          setTimeout(() => {
+            toast({
+              title: `🏆 Achievement Unlocked!`,
+              description: `${achievement.icon} ${achievement.name} (+${achievement.pointsAwarded} XP)`,
+              variant: 'success',
+            });
+          }, 500);
+        });
+      }
       setCompleteDialogOpen(false);
       setItemToComplete(null);
     } catch (error) {

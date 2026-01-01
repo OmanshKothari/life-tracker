@@ -103,11 +103,16 @@ export async function completeBucketItem(
   try {
     const userId = await profileService.getCurrentUserId();
     const { notes } = req.body as { notes?: string };
-    const { item, pointsAwarded } = await bucketListService.complete(req.params.id, userId, notes);
+    const { item, pointsAwarded, achievements } = await bucketListService.complete(
+      req.params.id,
+      userId,
+      notes
+    );
 
     sendSuccess(res, {
       ...item,
       pointsAwarded,
+      achievements,
       message: `Amazing! You earned ${pointsAwarded} XP!`,
     });
   } catch (error) {

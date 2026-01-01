@@ -1,6 +1,15 @@
 import { Routes, Route } from 'react-router-dom';
 import { Layout } from '@/components/layout';
-import { Dashboard, Goals, BucketList, Habits, Finance, ComingSoon, Savings } from '@/pages';
+import {
+  Dashboard,
+  Goals,
+  BucketList,
+  Habits,
+  Finance,
+  ComingSoon,
+  Savings,
+  Achievements,
+} from '@/pages';
 
 export default function AppRoutes() {
   return (
@@ -12,7 +21,7 @@ export default function AppRoutes() {
         <Route path="/habits" element={<Habits />} />
         <Route path="/finance" element={<Finance />} />
         <Route path="/savings" element={<Savings />} />
-        <Route path="/achievements" element={<ComingSoon title="Achievements" icon="🏆" />} />
+        <Route path="/achievements" element={<Achievements />} />
         <Route path="/settings" element={<ComingSoon title="Settings" icon="⚙️" />} />
         <Route path="/more" element={<ComingSoon title="More Options" icon="📋" />} />
       </Route>

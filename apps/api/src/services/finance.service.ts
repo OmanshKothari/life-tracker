@@ -1,4 +1,4 @@
-import { Income, Budget, SavingsGoal, ExpenseCategory, IncomeCategory } from '@prisma/client';
+import { Income, SavingsGoal, ExpenseCategory, IncomeCategory } from '@prisma/client';
 import {
   expenseRepository,
   incomeRepository,
@@ -9,6 +9,7 @@ import {
   PaginatedResult,
 } from '../repositories';
 import { profileService } from './profile.service';
+import { achievementsService, UnlockedAchievement } from './achievements.service';
 import { ApiError } from '../middlewares/errorHandler';
 
 // ============ EXPENSE SERVICE ============
@@ -197,10 +198,16 @@ class FinanceService {
       priority?: string;
       notes?: string | null;
     }
-  ): Promise<SavingsGoal> {
+  ): Promise<{ goal: SavingsGoal; achievements: UnlockedAchievement[] }> {
     const goal = await savingsGoalRepository.create(userId, data as any);
     await this.updateProfileTotalSaved(userId);
-    return goal;
+
+    // Check for SAVERS_START achievement
+    const achievements = await achievementsService.checkFinanceAchievements(userId, {
+      hasSavingsGoal: true,
+    });
+
+    return { goal, achievements };
   }
 
   async updateSavingsGoal(
@@ -221,11 +228,22 @@ class FinanceService {
     return goal;
   }
 
-  async addToSavings(id: string, userId: string, amount: number): Promise<SavingsGoal> {
+  async addToSavings(
+    id: string,
+    userId: string,
+    amount: number
+  ): Promise<{ goal: SavingsGoal; achievements: UnlockedAchievement[] }> {
     const goal = await savingsGoalRepository.addAmount(id, userId, amount);
     if (!goal) throw ApiError.notFound('Savings goal');
     await this.updateProfileTotalSaved(userId);
-    return goal;
+
+    // Check for FIRST_LAKH achievement
+    const totalSaved = await savingsGoalRepository.getTotalSaved(userId);
+    const achievements = await achievementsService.checkFinanceAchievements(userId, {
+      totalSaved,
+    });
+
+    return { goal, achievements };
   }
 
   async deleteSavingsGoal(id: string, userId: string): Promise<void> {

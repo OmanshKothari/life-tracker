@@ -53,6 +53,13 @@ export interface GoalsListResponse {
 
 export interface CompleteGoalResponse extends Goal {
   pointsAwarded: number;
+  achievements?: Array<{
+    code: string;
+    name: string;
+    description: string;
+    icon: string;
+    pointsAwarded: number;
+  }>;
 }
 
 export const goalsApi = {

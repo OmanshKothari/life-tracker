@@ -32,3 +32,5 @@ export type {
   CreateSavingsGoalData,
   UpdateSavingsGoalData,
 } from './savingsGoal.repository';
+export { achievementsRepository, AchievementsRepository } from './achievements.repository';
+export type { AchievementWithStatus } from './achievements.repository';

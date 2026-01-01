@@ -1,6 +1,7 @@
 import { BucketItem } from '@prisma/client';
 import { bucketListRepository } from '../repositories';
 import { profileService } from './profile.service';
+import { achievementsService, UnlockedAchievement } from './achievements.service';
 import { ApiError } from '../middlewares/errorHandler';
 import { PaginatedResult } from '../repositories/goals.repository';
 
@@ -80,7 +81,7 @@ class BucketListService {
     id: string,
     userId: string,
     notes?: string
-  ): Promise<{ item: BucketItem; pointsAwarded: number }> {
+  ): Promise<{ item: BucketItem; pointsAwarded: number; achievements: UnlockedAchievement[] }> {
     const existing = await bucketListRepository.findById(id, userId);
     if (!existing) {
       throw ApiError.notFound('Bucket item');
@@ -100,7 +101,14 @@ class BucketListService {
     await profileService.addXP(pointsAwarded);
     await profileService.incrementBucketCompleted();
 
-    return { item, pointsAwarded };
+    // Get updated count and check achievements
+    const profile = await profileService.getProfile();
+    const achievements = await achievementsService.checkBucketAchievements(
+      userId,
+      profile.profile.bucketCompleted
+    );
+
+    return { item, pointsAwarded, achievements };
   }
 
   /**

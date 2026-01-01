@@ -1,6 +1,7 @@
 import { Goal } from '@prisma/client';
 import { goalsRepository } from '../repositories';
 import { profileService } from './profile.service';
+import { achievementsService, UnlockedAchievement } from './achievements.service';
 import { ApiError } from '../middlewares/errorHandler';
 import { CreateGoalInput, UpdateGoalInput, GoalsQueryInput } from '@life-tracker/shared';
 import { PaginatedResult } from '../repositories/goals.repository';
@@ -84,7 +85,10 @@ class GoalsService {
   /**
    * Complete a goal - awards points and updates stats
    */
-  async complete(id: string, userId: string): Promise<{ goal: Goal; pointsAwarded: number }> {
+  async complete(
+    id: string,
+    userId: string
+  ): Promise<{ goal: Goal; pointsAwarded: number; achievements: UnlockedAchievement[] }> {
     // Get goal before completing to check status
     const existing = await goalsRepository.findById(id, userId);
 
@@ -109,9 +113,14 @@ class GoalsService {
     await profileService.addXP(pointsAwarded);
     await profileService.incrementGoalsCompleted();
 
-    // TODO: Check for achievements
+    // Get updated goals completed count and check achievements
+    const profile = await profileService.getProfile();
+    const achievements = await achievementsService.checkGoalAchievements(
+      userId,
+      profile.profile.goalsCompleted
+    );
 
-    return { goal, pointsAwarded };
+    return { goal, pointsAwarded, achievements };
   }
 
   /**

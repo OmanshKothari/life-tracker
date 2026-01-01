@@ -132,7 +132,7 @@ export async function updateHabit(req: Request, res: Response, next: NextFunctio
 export async function logHabit(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const userId = await profileService.getCurrentUserId();
-    const { log, pointsEarned, isNewCompletion } = await habitsService.logHabit(
+    const { log, pointsEarned, isNewCompletion, achievements } = await habitsService.logHabit(
       req.params.id,
       userId,
       req.body
@@ -142,6 +142,7 @@ export async function logHabit(req: Request, res: Response, next: NextFunction):
       log,
       pointsEarned,
       isNewCompletion,
+      achievements,
       message: isNewCompletion ? `Great job! You earned ${pointsEarned} XP!` : 'Habit log updated.',
     });
   } catch (error) {
